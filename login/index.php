@@ -47,7 +47,7 @@
         <div class="custom-alert error"><?= $_SESSION["fail"]; unset($_SESSION["fail"]); ?></div>
       <?php endif; ?>
     </div>
-    <form id="login-form" method="POST" action="<?= ROOT ?>/backEnd/controller/auth/login.php" onsubmit="disableSubmit()">
+    <form id="login-form" method="POST" action="<?= ROOT ?>/BackEnd/controller/auth/login.php" onsubmit="disableSubmit()">
       <fieldset>
         <legend>Email</legend>
         <input type="email" name="email" id="email" required />
