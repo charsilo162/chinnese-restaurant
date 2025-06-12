@@ -48,66 +48,175 @@ let months = [
   "November",
   "December",
 ];
+let events = [];
+
+// Load from server
+// fetch('/chinnese-restaurant/admin/calendar/get_events.php')
+//   .then(res => res.json())
+//   .then(res => {
+//     if (res.data_type === 'events') {
+//       events = res.data.map(updateEventTimes);
+//       updateCalendarView(currentView);
+//     } else {
+//       alert("Failed to load events: " + res.message);
+//     }
+//   });
+
+fetch("/chinnese-restaurant/admin/calendar/get_events.php")
+  .then(res => res.json())
+  .then(res => {
+    if (res.data_type === "events") {
+      events = res.data.map(updateEventTimes);
+     renderSidebarSchedule(events); // ✅ Render sidebar
+      updateCalendarView(currentView); // ✅ Render calendar
+    } else {
+      alert("Error loading events: " + res.message);
+    }
+  })
+
+
+
+// fetch("/chinnese-restaurant/admin/calendar/get_events.php")
+//   .then(res => res.json())
+//   .then(res => {
+//     if (res.data_type === "events") {
+//       events = res.data.map(updateEventTimes); // or whatever your normalizer function is
+//       updateCalendarView(currentView); // re-render calendar
+//     } else {
+//       console.error("Error loading events:", res.message);
+//     }
+//   })
+  .catch(err => console.error("Fetch failed:", err));
+
+document.querySelectorAll(".filter-btn").forEach(button => {
+  button.addEventListener("click", () => {
+    const type = button.dataset.type;
+    const filtered = events.filter(ev => ev.type === type);
+    renderSidebarSchedule(filtered); // ✅ reuse your existing function
+  });
+});
+
+
+function handleDayClick(dateString) {
+  const filtered = events.filter(e => e.event_date === dateString);
+  renderSidebarSchedule(filtered);
+}
+
+
+
+  
+function getInitials(name) {
+  return name
+    .split(' ')
+    .map(word => word[0])
+    .join('')
+    .toUpperCase();
+}
+
+function renderSidebarSchedule(events) {
+  const container = document.getElementById("scheduleDetails");
+  container.innerHTML = ""; // Clear previous content
+
+  events.forEach(event => {
+    const team = event.team || [];
+    const visible = team.slice(0, 3);
+    const remaining = team.length - visible.length;
+
+    const teamHTML = visible.map(member => `
+      <div class="team-member">
+        <div class="avatar">${getInitials(member)}</div>
+        ${member}
+      </div>`).join("");
+
+    const extraHTML = remaining > 0
+      ? `<div class="team-member"><div class="avatar">+${remaining}</div></div>`
+      : "";
+
+    const el = document.createElement("div");
+    el.classList.add("schedule-item");
+    el.innerHTML = `
+      <div class="schedule-title">${event.title}</div>
+      <div class="menu-updates-tag">${event.type}</div>
+
+      <div class="schedule-details-row">${event.event_date}</div>
+      <div class="schedule-details-row">${event.start_time} - ${event.end_time}</div>
+      <div class="schedule-details-row">${event.venue || "N/A"}</div>
+
+      <div class="team-section">
+        <div class="team-title">Team</div>
+        <div class="team-members">${teamHTML}${extraHTML}</div>
+      </div>
+
+      <div class="notes-section">
+        <div class="notes-title">Notes</div>
+        <div class="notes-content">${event.notes || "No notes"}</div>
+      </div>
+    `;
+
+    container.appendChild(el);
+  });
+}
+
 
 // Calendar events (for demonstration)
-let events = [
-  {
-    id: 1,
-    title: "New Seasonal Dish Tasting",
-    date: "2025-05-03",
-    time: "10:30 AM - 12:30 PM",
-    startTime: "10:30 AM",
-    endTime: "12:30 PM",
-    type: "new-dish",
-    people: ["HC", "SC", "+3"],
-  },
-  {
-    id: 2,
-    title: "Weekly Team Check-in",
-    date: "2025-05-04",
-    time: "11:00 AM - 12:30 PM",
-    startTime: "11:00 AM",
-    endTime: "12:30 PM",
-    type: "team-check",
-  },
-  {
-    id: 3,
-    title: "Inventory Audit",
-    date: "2025-05-04",
-    time: "10:30 AM - 12:30 PM",
-    startTime: "10:30 AM",
-    endTime: "12:30 PM",
-    type: "inventory",
-  },
-  {
-    id: 4,
-    title: "Weekly Team Check-in",
-    date: "2025-05-11",
-    time: "11:30 AM - 12:30 PM",
-    startTime: "11:30 AM",
-    endTime: "12:30 PM",
-    type: "team-check",
-  },
-  {
-    id: 5,
-    title: "Inventory Audit",
-    date: "2025-05-11",
-    time: "11:30 AM - 12:30 PM",
-    startTime: "11:30 AM",
-    endTime: "12:30 PM",
-    type: "inventory",
-  },
-  {
-    id: 6,
-    title: "New Seasonal Dish Tasting",
-    date: "2025-05-13",
-    time: "11:30 AM - 12:30 PM",
-    startTime: "11:30 AM",
-    endTime: "12:30 PM",
-    type: "new-dish",
-    people: ["HC", "SC", "+3"],
-  },
-];
+// let events = [
+//   {
+//     id: 1,
+//     title: "New Seasonal Dish Tasting",
+//     date: "2025-05-03",
+//     time: "10:30 AM - 12:30 PM",
+//     startTime: "10:30 AM",
+//     endTime: "12:30 PM",
+//     type: "new-dish",
+//     people: ["HC", "SC", "+3"],
+//   },
+//   {
+//     id: 2,
+//     title: "Weekly Team Check-in",
+//     date: "2025-05-04",
+//     time: "11:00 AM - 12:30 PM",
+//     startTime: "11:00 AM",
+//     endTime: "12:30 PM",
+//     type: "team-check",
+//   },
+//   {
+//     id: 3,
+//     title: "Inventory Audit",
+//     date: "2025-05-04",
+//     time: "10:30 AM - 12:30 PM",
+//     startTime: "10:30 AM",
+//     endTime: "12:30 PM",
+//     type: "inventory",
+//   },
+//   {
+//     id: 4,
+//     title: "Weekly Team Check-in",
+//     date: "2025-05-11",
+//     time: "11:30 AM - 12:30 PM",
+//     startTime: "11:30 AM",
+//     endTime: "12:30 PM",
+//     type: "team-check",
+//   },
+//   {
+//     id: 5,
+//     title: "Inventory Audit",
+//     date: "2025-05-11",
+//     time: "11:30 AM - 12:30 PM",
+//     startTime: "11:30 AM",
+//     endTime: "12:30 PM",
+//     type: "inventory",
+//   },
+//   {
+//     id: 6,
+//     title: "New Seasonal Dish Tasting",
+//     date: "2025-05-13",
+//     time: "11:30 AM - 12:30 PM",
+//     startTime: "11:30 AM",
+//     endTime: "12:30 PM",
+//     type: "new-dish",
+//     people: ["HC", "SC", "+3"],
+//   },
+// ];
 
 //   Function to parse the time string and update events
 function updateEventTimes(event) {
@@ -237,31 +346,38 @@ function generateMonthView(month, year) {
       dayCell.classList.add("today");
     }
 
-    dayCell.addEventListener("click", (event) => {
-      // Check if the click target is the day cell itself or the day number
-      if (
-        event.target === dayCell ||
-        event.target.classList.contains("day-number")
-      ) {
-        const year = parseInt(dayCell.dataset.year);
-        const month = parseInt(dayCell.dataset.month);
-        const day = parseInt(dayCell.dataset.day);
-        const newSelectedDate = new Date(year, month, day);
+dayCell.addEventListener("click", (event) => {
+  if (
+    event.target === dayCell ||
+    event.target.classList.contains("day-number")
+  ) {
+    const year = parseInt(dayCell.dataset.year);
+    const month = parseInt(dayCell.dataset.month);
+    const day = parseInt(dayCell.dataset.day);
+    const formattedDate = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 
-        // Format the date for the new schedule form
-        const formattedDate = `${newSelectedDate.getFullYear()}-${String(
-          newSelectedDate.getMonth() + 1
-        ).padStart(2, "0")}-${String(newSelectedDate.getDate()).padStart(
-          2,
-          "0"
-        )}`;
-        const dateInput = document.getElementById("scheduleDate");
-        dateInput.value = formattedDate;
-        selectedDate = formattedDate;
+    const filtered = events.filter(e => e.event_date === formattedDate);
 
-        showNewScheduleForm(); // Open the new schedule form
-      }
-    });
+    const dateInput = document.getElementById("scheduleDate");
+    if (dateInput) dateInput.value = formattedDate;
+
+    document.querySelectorAll(".calendar-day").forEach(cell =>
+      cell.classList.remove("selected"));
+    dayCell.classList.add("selected");
+
+    selectedDate = formattedDate;
+
+    if (filtered.length > 0) {
+      renderSidebarSchedule(filtered);  // Make sure this function exists
+    } else {
+      showNewScheduleForm(); // Open form to create new schedule
+    }
+  }
+});
+
+
+
+
 
     const dayNumber = document.createElement("div");
     dayNumber.classList.add("day-number");
@@ -722,31 +838,73 @@ function hideNewScheduleForm() {
   container.classList.remove("slide-left");
 }
 
+// createScheduleBtn.addEventListener("click", (e) => {
+//   e.preventDefault();
+
+//   const timeParts = timeInput.value.split(" - "); // Assuming the input is also "startTime - endTime"
+//   const startTime = timeParts[0] ? timeParts[0].trim() : timeInput.value.trim();
+//   const endTime = timeParts[1] ? timeParts[1].trim() : endTimeInput.value;
+
+//   const newEvent = {
+//     title: titleInput.value,
+//     type: categoryInput.value,
+//     date: dateInput.value,
+//     time: timeInput.value,
+//     startTime: startTime,
+//     endTime: endTime,
+//     team: teamInput.value.split(",").map((item) => item.trim()),
+//     venue: venueInput.value,
+//     notes: notesInput.value,
+//     people: teamInput.value.split(",").map((item) => item.trim()),
+//   };
+
+//   events.push(newEvent);
+//   updateCalendarView(currentView);
+//   hideNewScheduleForm();
+//   resetForm();
+//   alert("New schedule created successfully!");
+// });
 createScheduleBtn.addEventListener("click", (e) => {
   e.preventDefault();
 
-  const timeParts = timeInput.value.split(" - "); // Assuming the input is also "startTime - endTime"
-  const startTime = timeParts[0] ? timeParts[0].trim() : timeInput.value.trim();
-  const endTime = timeParts[1] ? timeParts[1].trim() : endTimeInput.value;
+  const startTime = timeInput.value.trim();
+  const endTime = endTimeInput.value.trim();
 
   const newEvent = {
     title: titleInput.value,
     type: categoryInput.value,
     date: dateInput.value,
-    time: timeInput.value,
     startTime: startTime,
     endTime: endTime,
-    team: teamInput.value.split(",").map((item) => item.trim()),
+    team: teamInput.value.split(',').map(item => item.trim()),
     venue: venueInput.value,
-    notes: notesInput.value,
-    people: teamInput.value.split(",").map((item) => item.trim()),
+    notes: notesInput.value
   };
 
-  events.push(newEvent);
-  updateCalendarView(currentView);
-  hideNewScheduleForm();
-  resetForm();
-  alert("New schedule created successfully!");
+  fetch('create_event.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(newEvent)
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.data_type === 'event_created') {
+        alert('Event created!');
+        newEvent.id = data.event_id;
+        newEvent.time = `${newEvent.startTime} - ${newEvent.endTime}`;
+        newEvent.people = newEvent.team;
+        events.push(newEvent);
+        updateCalendarView(currentView);
+        hideNewScheduleForm();
+        resetForm();
+      } else {
+        alert('Failed: ' + data.message);
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      alert('Error connecting to server');
+    });
 });
 
 // Local Storage Handling
@@ -831,7 +989,12 @@ function addEventToCalendar(event) {
               `;
     }
 
-    eventElement.innerHTML = eventContent;
+   eventContent += `
+  <button class="edit-btn" data-id="${event.id}">✏️</button>
+  <button class="delete-btn" data-id="${event.id}">🗑️</button>
+`;
+eventElement.innerHTML = eventContent;
+
 
     // Add to target cell
     targetCell.appendChild(eventElement);
