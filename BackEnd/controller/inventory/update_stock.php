@@ -1,6 +1,5 @@
 <?php
 require_once __DIR__ . '/../../config/init.php';
-
 $input = json_decode(file_get_contents('php://input'), true);
 
 if (!isset($input['item_id'], $input['new_stock'])) {
@@ -11,7 +10,7 @@ if (!isset($input['item_id'], $input['new_stock'])) {
 $itemId = (int)$input['item_id'];
 $newStock = (int)$input['new_stock'];
 
-$sql = "UPDATE items SET stock_quantity = :stock WHERE id = :id";
+$sql = "UPDATE stock SET qty = :stock WHERE id = :id";
 $result = db_query($sql, ['stock' => $newStock, 'id' => $itemId]);
 
 echo json_encode([

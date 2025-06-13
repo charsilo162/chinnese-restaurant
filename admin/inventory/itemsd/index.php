@@ -1,9 +1,8 @@
 <?php
 require_once __DIR__ . '/../../../BackEnd/config/init.php';
-
-UserSession::requireLogin();
+UserSession::requireLogin(); // Restrict page access
 UserSession::requireRole(['staff', 'admin', 'super_admin']);
-$first_name = UserSession::getFirstName();
+$first_name = UserSession::getFirstName(); // Get user's first name
 $userRole = UserSession::get('role');
 $profilePicture = UserSession::getProfilePicture();
 $categories = getCategories(); // returns array of associative arrays by default
@@ -410,6 +409,8 @@ $categories = getCategories(); // returns array of associative arrays by default
   </div>
 </div>
 
+
+
 <script>
   // JavaScript to handle dynamic form behavior
   document.getElementById('has_options').addEventListener('change', function () {
@@ -815,143 +816,59 @@ $(document).ready(function () {
       });
   });
 
-  // //Submit reorder form
-  // reorderForm.on('submit', function (e) {
-  //   e.preventDefault();
-  //   const itemId = reorderItemId.val();
-  //   const reorderQty = reorderQuantity.val();
-  //   if (!reorderQty || isNaN(reorderQty) || reorderQty < 1) {
-  //     alert('Please enter a valid reorder quantity.');
-  //     return;
-  //   }
-  //     //console.log(itemId);
-  //   fetch('../../../BackEnd/controller/inventory/place_reorder.php', {
-  //     method: 'POST',
-  //     headers: { 'Content-Type': 'application/json' },
-  //     body: JSON.stringify({
-  //       item_id: itemId,
-  //       reorder_quantity: parseInt(reorderQty)
-  //     })
-  //   })
-  //     .then(res => {
-  //       res.text().then(text => {
-  //         console.log('Raw response from place_reorder.php:', text);
-  //         try {
-  //           return JSON.parse(text);
-  //         } catch (e) {
-  //           throw new Error('JSON parse failed: ' + text);
-  //         }
-  //       });
-  //     })
-  //     .then(data => {
-  //      // console.log(data);
-  //       if (data.success) {
-  //         alert('Reorder placed successfully!');
-  //         reorderModal.add(modalBackdrop).removeClass('show');
-  //         table.ajax.reload(null, false);
-  //       } else {
-  //         alert('Error: ' + data.message);
-  //       }
-  //     })
-  //     .catch(err => {
-  //       alert('Request failed: ' + err.message);
-  //     });
-  // });
-
-reorderForm.on('submit', function (e) {
-  e.preventDefault();
-  const itemId = reorderItemId.val();
-  const reorderQty = reorderQuantity.val();
-  if (!reorderQty || isNaN(reorderQty) || reorderQty < 1) {
-    alert('Please enter a valid reorder quantity.');
-    return;
-  }
-  const requestBody = {
-    item_id: itemId,
-    reorder_quantity: parseInt(reorderQty)
-  };
-  console.log('Sending request:', requestBody);
-  console.log('Request URL:', '/chinnese-restaurant/BackEnd/controller/inventory/place_reorder.php'); // Adjusted URL
-  fetch('/chinnese-restaurant/BackEnd/controller/inventory/place_reorder.php', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(requestBody)
-  })
-    .then(res => {
-      console.log('Response:', {
-        status: res.status,
-        ok: res.ok,
-        url: res.url
+  // Submit reorder form
+  reorderForm.on('submit', function (e) {
+    e.preventDefault();
+    const itemId = reorderItemId.val();
+    const reorderQty = reorderQuantity.val();
+    if (!reorderQty || isNaN(reorderQty) || reorderQty < 1) {
+      alert('Please enter a valid reorder quantity.');
+      return;
+    }
+    fetch('../../../BackEnd/controller/inventory/place_reorder.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        item_id: itemId,
+        reorder_quantity: parseInt(reorderQty)
+      })
+    })
+      .then(res => {
+        res.text().then(text => {
+          console.log('Raw response from place_reorder.php:', text);
+          try {
+            return JSON.parse(text);
+          } catch (e) {
+            throw new Error('JSON parse failed: ' + text);
+          }
+        });
+      })
+      .then(data => {
+        if (data.success) {
+          alert('Reorder placed successfully!');
+          reorderModal.add(modalBackdrop).removeClass('show');
+          table.ajax.reload(null, false);
+        } else {
+          alert('Error: ' + data.message);
+        }
+      })
+      .catch(err => {
+        alert('Request failed: ' + err.message);
       });
-      if (!res.ok) {
-        throw new Error(`HTTP error! Status: ${res.status} ${res.statusText}`);
-      }
-      return res.text(); // Use text to debug raw response
-    })
-    .then(text => {
-      console.log('Raw response:', text);
-      if (!text) {
-        throw new Error('Empty response from server');
-      }
-      try {
-        const data = JSON.parse(text);
-        console.log('Parsed JSON:', data);
-        return data;
-      } catch (e) {
-        throw new Error(`JSON parse error: ${e.message}, Raw response: ${text}`);
-      }
-    })
-    .then(data => {
-      console.log('Data received:', data);
-      if (typeof data !== 'object' || data === null) {
-        throw new Error('Invalid JSON object');
-      }
-      if (data.success) {
-        alert('Reorder placed successfully!');
-        reorderModal.add(modalBackdrop).removeClass('show');
-        table.ajax.reload(null, false);
-      } else {
-        alert('Error: ' + (data.message || 'Unknown error'));
-      }
-    })
-    .catch(err => {
-      console.error('Fetch error:', err);
-      alert('Request failed: ' + err.message);
-    });
+  });
 });
-
-
-
-  
-});
-
-
-
-  const username = '<?php echo addslashes($first_name); ?>';
-      const userRole = '<?php echo addslashes($userRole); ?>';
-      const profilePicture = '<?php echo addslashes($profilePicture); ?>';
     </script>
+     <script>
+
+const username = '<?php echo addslashes($first_name); ?>';
+const userRole = '<?php echo addslashes($userRole); ?>';
+const profilePicture = '<?php echo addslashes($profilePicture); ?>';
+</script>
     <script src="../../scripts/components.js"></script>
     <script src="../../scripts/inventory.js"></script>
 
   </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

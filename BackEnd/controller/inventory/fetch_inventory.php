@@ -2,18 +2,18 @@
 require_once __DIR__ . '/../../config/init.php';
 $sql = "
     SELECT 
-        i.id,
-        i.name,
+        s.id,
+        s.name,
         c.name AS category,
-        i.stock_quantity,
-        i.reorder_quantity
-    FROM items i
-    LEFT JOIN categories c ON i.category_id = c.id
+        s.qty as stock_quantity,
+        s.record_qty as reorder_quantity
+    FROM stock s
+    LEFT JOIN inves_categories c ON s.category_id = c.id
 ";
 
 $items = db_query($sql, [], 'assoc');
 $data = [];
-
+//var_dump($items);die;
 if ($items !== false) {
     foreach ($items as $item) {
         $status = 'Available';

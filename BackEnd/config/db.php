@@ -102,7 +102,7 @@ function db_query(string $query, array $data = [], string $data_type = 'object')
 function getCategories($asObjects = false) {
     $dataType = $asObjects ? 'object' : 'assoc';
     // Use your db_query helper to get categories from the table `categories`
-    return db_query("SELECT * FROM categories ORDER BY name ASC", [], $dataType);
+    return db_query("SELECT * FROM inves_categories ORDER BY name ASC", [], $dataType);
 }
 
 // Utility function to handle file upload
