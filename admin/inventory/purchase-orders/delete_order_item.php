@@ -21,6 +21,7 @@ $orderIdInput = trim($input['order_id']); // Trim whitespace/newlines
 error_log("Received order_id: " . $orderIdInput);
 
 // Extract numeric part (e.g., "PO123\nJun 11, 2025" -> "123")
+
 if (preg_match('/^PO(\d+)/', $orderIdInput, $matches)) {
     $formattedId = intval($matches[1]);
     $orderId = $formattedId - 100; // Subtract 100 to get database ID
@@ -33,7 +34,6 @@ if (preg_match('/^PO(\d+)/', $orderIdInput, $matches)) {
     echo json_encode(['success' => false, 'message' => 'Invalid order ID format']);
     exit;
 }
-
 $items = $input['items'];
 $updatedItems = [];
 

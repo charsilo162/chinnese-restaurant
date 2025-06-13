@@ -1,6 +1,21 @@
 <?php 
 require_once __DIR__ . '/../../../BackEnd/config/init.php';
 //requireAdmin();
+
+ 
+if (!isset($_SESSION['user']['id']) || !isset($_SESSION['user']['role'])) {
+    header("Location: /chinnese-restaurant/login/");
+    exit();
+}
+
+$username = $_SESSION['user']['name'] ?? '';
+// var_dump($username); // Debug: Check session data
+ 
+$parts = explode(" ", $username);
+$first_name = $parts[0];
+ 
+$userRole = $_SESSION['user']['role'] ?? '';
+$profilePicture = $_SESSION['user']['profile_picture'] ?? 'https://picsum.photos/40';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -1272,6 +1287,15 @@ console.log('Tabs found:', $('.inventory-actions .tabs .tab').length); // Debug
     setupCategoryToggle(0);
     updateSummary();
   });
+
+    
+</script>
+
+ <script>
+
+const username = '<?php echo addslashes($first_name); ?>';
+const userRole = '<?php echo addslashes($userRole); ?>';
+const profilePicture = '<?php echo addslashes($profilePicture); ?>';
 </script>
     <script src="../../scripts/components.js"></script>
   </body>
